@@ -10,18 +10,21 @@ from openml._api.http.client import HTTPClient
 from openml._api.resources import (
     DatasetsV1,
     DatasetsV2,
+    EvaluationsV1,
+    EvaluationsV2,
     TasksV1,
     TasksV2,
 )
 
 if TYPE_CHECKING:
-    from openml._api.resources.base import DatasetsAPI, TasksAPI
+    from openml._api.resources.base import DatasetsAPI, EvaluationsAPI, TasksAPI
 
 
 class APIBackend:
-    def __init__(self, *, datasets: DatasetsAPI, tasks: TasksAPI):
+    def __init__(self, *, datasets: DatasetsAPI, tasks: TasksAPI, evaluations: EvaluationsAPI):
         self.datasets = datasets
         self.tasks = tasks
+        self.evaluations = evaluations
 
 
 def build_backend(version: str, *, strict: bool) -> APIBackend:
@@ -29,16 +32,14 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     v2_http = HTTPClient(API_V2_SERVER)
 
     v1 = APIBackend(
-        datasets=DatasetsV1(v1_http),
-        tasks=TasksV1(v1_http),
+        datasets=DatasetsV1(v1_http), tasks=TasksV1(v1_http), evaluations=EvaluationsV1(v1_http)
     )
 
     if version == "v1":
         return v1
 
     v2 = APIBackend(
-        datasets=DatasetsV2(v2_http),
-        tasks=TasksV2(v2_http),
+        datasets=DatasetsV2(v2_http), tasks=TasksV2(v2_http), evaluations=EvaluationsV2(v2_http)
     )
 
     if strict:
